@@ -1,0 +1,34 @@
+# Stage Container Deploy TESTING
+on:
+  workflow_call:
+    inputs:
+      VAR_ONE:
+        required: true
+        type: string
+      VAR_TWO:
+        required: true
+        type: string
+
+permissions: read-all
+  
+# Set defaults
+defaults:
+    run:
+      shell: bash
+
+jobs:
+    deploy:
+      name: Stage Deploy TESTING
+      runs-on: ubuntu-latest
+      steps:
+        - name: Show values
+          run: |
+            echo ${{ inputs.VAR_ONE }}
+            echo ${{ inputs.VAR_TWO }}
+            echo ${{ github.ref }}
+            echo ${{ github.event.release.target_commitish }}
+  
+        - name: Show GitHub context
+          env:
+            GITHUB_CONTEXT: ${{ toJson(github) }}
+          run: echo "$GITHUB_CONTEXT"
