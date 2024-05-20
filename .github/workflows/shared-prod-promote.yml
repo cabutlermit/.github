@@ -19,17 +19,48 @@ defaults:
     shell: bash
 
 jobs:
-  deploy:
+  fake_deploy:
     if: ${{ github.ref == 'refs/heads/main' || github.event.release.target_commitish == 'main' }}
-    name: Deploy TESTING
+    name: Fake Deploy TESTING
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+
+      - name: Check SHAs
+        id: check_sha
+        run: | 
+          export HEAD_SHA=$(git rev-parse --short=8 HEAD)
+          export ECR_SHA_BAD=${{ inputs.VAR_ONE }}
+          export ECR_SHA_GOOD=$(git rev-parse --short=8 HEAD)
+          if [[ $HEAD_SHA == $ECR_SHA_GOOD ]]; then
+            echo "good_sha_match=true" >> $GITHUB_ENV
+          else
+            echo "good_sha_match=false" >> $GITHUB_ENV
+          fi
+          if [[ $HEAD_SHA == $ECR_SHA_BAD ]]; then
+            echo "bad_sha_match=true" >> $GITHUB_ENV
+          else
+            echo "bad_sha_match=false" >> $GITHUB_ENV
+          fi
+
       - name: Show values
         run: |
           echo ${{ inputs.VAR_ONE }}
           echo ${{ inputs.VAR_TWO }}
           echo ${{ github.ref }}
           echo ${{ github.event.release.target_commitish }}
+
+      - name: Run On True
+        if: ${{ env.good_sha_match == 'true'}}
+        run: |
+          echo "The SHAs matched! (the next line should be true)"
+          echo ${{ env.good_sha_match}}
+
+      - name: Run on False
+        if: ${{ env.bad_sha_match == 'false' }}
+        run: |
+          echo "The SHAs did NOT match (the next line should be false)"
+          echo ${{ env.bad_sha_match}}
 
       - name: Show GitHub context
         env:
