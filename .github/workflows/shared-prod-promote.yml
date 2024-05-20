@@ -49,6 +49,8 @@ jobs:
           echo ${{ inputs.VAR_TWO }}
           echo ${{ github.ref }}
           echo ${{ github.event.release.target_commitish }}
+          echo ${{ env.good_sha_match }}
+          echo ${{ env.bad_sha_match }}
 
       - name: Run On True
         if: ${{ env.good_sha_match == 'true'}}
@@ -66,3 +68,10 @@ jobs:
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: echo "$GITHUB_CONTEXT"
+
+      - name: Report Failure
+        if: ${{ env.bad_sha_match == 'false' }}
+        id: failure
+        run: |
+          echo "FAILURE: Stage-Workloads SHA did not match the main branch."
+          exit 1
