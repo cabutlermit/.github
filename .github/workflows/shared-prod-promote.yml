@@ -32,7 +32,7 @@ jobs:
           export HEAD_SHA=$(git rev-parse --short=8 HEAD)
           export ECR_SHA_BAD=${{ inputs.VAR_ONE }}
           export ECR_SHA_GOOD=$(git rev-parse --short=8 HEAD)
-          if [[ $HEAD_SHA == $ECR_SHA_GOOD ]]; then
+          if [[ $HEAD_SHA == $ECR_SHA_BAD ]]; then
             echo "sha_match=true" >> $GITHUB_ENV
           else
             echo "sha_match=false" >> $GITHUB_ENV
