@@ -33,14 +33,11 @@ jobs:
           export ECR_SHA_BAD=${{ inputs.VAR_ONE }}
           export ECR_SHA_GOOD=$(git rev-parse --short=8 HEAD)
           if [[ $HEAD_SHA == $ECR_SHA_GOOD ]]; then
-            echo "good_sha_match=true" >> $GITHUB_ENV
+            echo "sha_match=true" >> $GITHUB_ENV
           else
-            echo "good_sha_match=false" >> $GITHUB_ENV
-          fi
-          if [[ $HEAD_SHA == $ECR_SHA_BAD ]]; then
-            echo "bad_sha_match=true" >> $GITHUB_ENV
-          else
-            echo "bad_sha_match=false" >> $GITHUB_ENV
+            echo "sha_match=false" >> $GITHUB_ENV
+            echo "FAILURE: Stage-Workloads SHA did not match the main branch." >> $GITHUB_STEP_SUMMARY
+            exit 1
           fi
 
       - name: Show values
@@ -49,29 +46,21 @@ jobs:
           echo ${{ inputs.VAR_TWO }}
           echo ${{ github.ref }}
           echo ${{ github.event.release.target_commitish }}
-          echo ${{ env.good_sha_match }}
-          echo ${{ env.bad_sha_match }}
+          echo ${{ env.sha_match }}
 
       - name: Run On True
-        if: ${{ env.good_sha_match == 'true'}}
+        if: ${{ env.sha_match == 'true'}}
         run: |
           echo "The SHAs matched! (the next line should be true)"
-          echo ${{ env.good_sha_match}}
+          echo ${{ env.sha_match}}
 
       - name: Run on False
-        if: ${{ env.bad_sha_match == 'false' }}
+        if: ${{ env.sha_match == 'false' }}
         run: |
           echo "The SHAs did NOT match (the next line should be false)"
-          echo ${{ env.bad_sha_match}}
+          echo ${{ env.sha_match}}
 
       - name: Show GitHub context
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: echo "$GITHUB_CONTEXT"
-
-      - name: Report Failure
-        if: ${{ env.good_sha_match == 'false' }}
-        id: failure
-        run: |
-          echo "FAILURE: Stage-Workloads SHA did not match the main branch." >> $GITHUB_STEP_SUMMARY
-          exit 1
