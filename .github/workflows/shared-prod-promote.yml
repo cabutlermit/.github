@@ -70,7 +70,7 @@ jobs:
         run: echo "$GITHUB_CONTEXT"
 
       - name: Report Failure
-        if: ${{ env.bad_sha_match == 'false' }}
+        if: ${{ env.good_sha_match == 'false' }}
         id: failure
         run: |
           echo "FAILURE: Stage-Workloads SHA did not match the main branch." >> $GITHUB_STEP_SUMMARY
