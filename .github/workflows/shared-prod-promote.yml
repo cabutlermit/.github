@@ -73,5 +73,5 @@ jobs:
         if: ${{ env.bad_sha_match == 'false' }}
         id: failure
         run: |
-          echo "FAILURE: Stage-Workloads SHA did not match the main branch."
+          echo "FAILURE: Stage-Workloads SHA did not match the main branch." >> $GITHUB_STEP_SUMMARY
           exit 1
